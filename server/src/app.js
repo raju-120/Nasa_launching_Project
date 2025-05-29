@@ -21,8 +21,8 @@ app.use(express.static(path.join(__dirname, '..','public' )))
 
 
 //importing the planets router
-app.use(planetsRouter);
-app.use(launchesRouter);
+app.use('/planets',planetsRouter);
+app.use('/launches',launchesRouter);
 
 
 
