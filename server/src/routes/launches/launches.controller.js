@@ -7,8 +7,8 @@ const {
 
 
 //Get all the launches item
-function httpGetAllLaunches(req, res){
-    return res.status(200).json(getAllLaunches());
+async function httpGetAllLaunches(req, res){
+    return res.status(200).json(await getAllLaunches());
 }
 
 // Post a New added launch

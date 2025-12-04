@@ -1,6 +1,6 @@
-// const launches = require('./launches.mongo');
-const launches = new Map();
+const launchesDataBase = require('./launches.mongo');
 
+const launches = new Map();
 
 let latestFlightNumber = 100;
 
@@ -15,7 +15,8 @@ const launch={
     success: true,
 }
 
-launches.set(launch.flightNumber, launch);
+saveLaunchData(launch);  //Saved into  the DB
+// launches.set(launch.flightNumber, launch);
 
 //
 function existsLaunchWithId(launchId){
@@ -23,8 +24,21 @@ function existsLaunchWithId(launchId){
 }
 
 //Get all the launches without passing the actual model data
-function getAllLaunches(){
-    return Array.from(launches.values());
+async function getAllLaunches(){
+    return await launchesDataBase
+                .find({},{
+                    '_id': 0,
+                    '__v': 0,
+                });
+}
+
+//Saved into the DB
+async function saveLaunchData(launch){
+    await launchesDataBase.updateOne({
+        flightNumber: launch.flightNumber,
+    }, launch ,{
+        upsert: true,
+    })
 }
 
 //For set up to the db

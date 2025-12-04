@@ -2,7 +2,10 @@ const fs = require('fs');
 const path = require('path'); // Use the 'path' module to resolve file paths
 const { parse } = require('csv-parse');
 
-const habitablePlanet = [];
+const planets = require('./planets.mongo.js');
+
+
+// const habitablePlanet = [];
 
 function isHabitablePlanet(planet) {
   return (
@@ -24,24 +27,55 @@ function loadPlanetsData() {
           columns: true,
         })
       )
-      .on('data', (data) => {
+      .on('data', async(data) => {
+        // console.log('CSV columns:', Object.keys(data)); // See all column names
+        // console.log('Sample data:', data); // See sample row
+        
         if (isHabitablePlanet(data)) {
-          habitablePlanet.push(data);
+          savePlanet(data);
         }
       })
+      // .on('data', async(data) => {
+      //   if (isHabitablePlanet(data)) {
+      //     // habitablePlanet.push(data);
+      //     // to do:Replace below create with insert + update = upsert
+      //     // console.log('DATA saved in save planet data: ', data) 
+      //     savePlanet(data);
+      //   }
+      // })
       .on('error', (err) => {
         console.error('Error reading CSV:', err);
         reject(err);
       })
-      .on('end', () => {
-        console.log(`${habitablePlanet.length} habitable planets found!`);
-        resolve(habitablePlanet);
+      .on('end', async() => {
+        const countPlanetsFound = (await getAllPlanets()).length;
+        console.log(`${countPlanetsFound} habitable planets found!`);
+        resolve();
       });
   });
 }
 
-function getAllPlanets () {
-  return habitablePlanet;
+async function getAllPlanets() {
+  return await planets.find({},{
+    '__v': 0, '__v':0
+  })
+}
+
+async function savePlanet(planet){
+  try{
+    await planets.updateOne({
+      keplerName: planet['kepler_name'],  // Changed from data to planet
+    },{
+      $set:{
+        keplerName: planet['kepler_name'],  // Changed from data to planet
+      }
+    },{
+      upsert: true,
+    });
+    //  console.log(`✓ Saved planet: ${planet['kepler_name']}`); // Add this
+  }catch(err){
+    console.error(`Could not save the planet ${err.message}`)
+  }
 }
 
 module.exports = {

@@ -18,7 +18,7 @@ const Launch = props => {
       <li>Planetary radius &lt; 1.6 times Earth's radius</li>
       <li>Effective stellar flux &gt; 0.36 times Earth's value and &lt; 1.11 times Earth's value</li>
     </ul>
-
+    {/* <Paragraph> Line 2 Schedule a mission {selectorBody.length} launch for interstellar travel to one of the Kepler Exoplanets.</Paragraph> */}
     <form onSubmit={props.submitLaunch} style={{display: "inline-grid", gridTemplateColumns: "auto auto", gridGap: "10px 20px"}}>
       <label htmlFor="launch-day">Launch Date</label>
       <input type="date" id="launch-day" name="launch-day" min={today} max="2040-12-31" defaultValue={today} />
