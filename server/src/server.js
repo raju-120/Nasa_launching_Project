@@ -5,6 +5,7 @@ const app = require('./app');
 
 
 const {loadPlanetsData} = require("./models/planet.model.js")
+const {loadLaunchData } = require("./models/launches.model.js")
 
 const PORT = process.env.PORT || 8000;
 
@@ -23,19 +24,28 @@ mongoose.connection.on('error', (err)=>{
 })
 
 async function startServer() {
-  // Connect to DB (NO OLD OPTIONS)
   try {
-    await mongoose.connect(MONGO_URL);
-    console.log("MongoDB connected successfully");
+    if (!MONGO_URL) {
+      throw new Error("MONGODB_URL environment variable is not set");
+    }
+
+    // Connect to DB
+    await mongoose.connect(MONGO_URL, {
+      serverSelectionTimeoutMS: 30000, // Give it more time
+    });
+    
+    console.log("✅ MongoDB connected successfully");
 
     await loadPlanetsData();
+    await loadLaunchData(); // Add this line
 
     server.listen(PORT, () => {
-      console.log(`Server is running on ${PORT}`);
+      console.log(`🚀 Server is running on port ${PORT}`);
     });
 
   } catch (err) {
-    console.error("Failed to connect MongoDB:", err.message);
+    console.error("❌ Failed to start server:", err.message);
+    process.exit(1);
   }
 }
 
